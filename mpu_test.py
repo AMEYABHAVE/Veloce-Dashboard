@@ -3,11 +3,12 @@ kivy.require('2.0.0')
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
-import random
-from kivy.clock import Clock, mainthread
+from kivy.clock import Clock
+
+from kivy.core.window import Window
+Window.size = (800, 480)
 
 import  smbus
-from time import sleep 
 
 PWR_MGMT_1 = 0x6B
 SMPLRT_DIV = 0x19
@@ -23,8 +24,6 @@ GYRO_ZOUT_H = 0x47
 
 bus= smbus.SMBus(1)
 Device_Address = 0x68
-
-
 
 class Main_Class(FloatLayout):
 
@@ -63,8 +62,14 @@ class Main_Class(FloatLayout):
         Gy = gyro_y/131.0
         Gz = gyro_z/131.0
 
-        self.Test1.text= str(int(Gx))
-        Clock.schedule_once(self.MPU_data, 0.5)
+        self.Test1.text= str(int(Ax))
+        self.Test2.text= str(int(Ay))
+        self.Test3.text= str(int(Az))
+        self.Test4.text= str(int(Gx))
+        self.Test5.text= str(int(Gy))
+        self.Test6.text= str(int(Gz))
+
+        Clock.schedule_once(self.MPU_data, 0.1)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -76,7 +81,77 @@ class Main_Class(FloatLayout):
             font_size = "84sp",
             bold = True,
             #size and position
-            size_hint = (.50,.50),
+            size_hint = (.20,.20),
+            pos_hint = {"x":.1, "y":.1},
+            #color settings
+            color = (0,0,0,1),
+            background_color = (255,0,0,255)
+        )
+
+        self.Test2 = Button(
+            disabled = True,
+            #text settings
+            text = "20*",
+            font_size = "84sp",
+            bold = True,
+            #size and position
+            size_hint = (.20,.20),
+            pos_hint = {"x":.3, "y":.1},
+            #color settings
+            color = (0,0,0,1),
+            background_color = (255,0,0,255)
+        )
+
+        self.Test3 = Button(
+            disabled = True,
+            #text settings
+            text = "20*",
+            font_size = "84sp",
+            bold = True,
+            #size and position
+            size_hint = (.20,.20),
+            pos_hint = {"x":.5, "y":.1},
+            #color settings
+            color = (0,0,0,1),
+            background_color = (255,0,0,255)
+        )
+
+        self.Test4 = Button(
+            disabled = True,
+            #text settings
+            text = "20*",
+            font_size = "84sp",
+            bold = True,
+            #size and position
+            size_hint = (.20,.20),
+            pos_hint = {"x":.1, "y":.5},
+            #color settings
+            color = (0,0,0,1),
+            background_color = (255,0,0,255)
+        )
+
+        self.Test5 = Button(
+            disabled = True,
+            #text settings
+            text = "20*",
+            font_size = "84sp",
+            bold = True,
+            #size and position
+            size_hint = (.20,.20),
+            pos_hint = {"x":.3, "y":.5},
+            #color settings
+            color = (0,0,0,1),
+            background_color = (255,0,0,255)
+        )
+
+        self.Test6 = Button(
+            disabled = True,
+            #text settings
+            text = "20*",
+            font_size = "84sp",
+            bold = True,
+            #size and position
+            size_hint = (.20,.20),
             pos_hint = {"x":.5, "y":.5},
             #color settings
             color = (0,0,0,1),
@@ -84,16 +159,22 @@ class Main_Class(FloatLayout):
         )
 
         self.add_widget(self.Test1)
+        self.add_widget(self.Test2)
+        self.add_widget(self.Test3)
+        self.add_widget(self.Test4)
+        self.add_widget(self.Test5)
+        self.add_widget(self.Test6)
 
         self.MPU_Init()
         self.MPU_data()
-
-
-
            
 class Test_App(App):
 
     def build(self):
+
+        Window.borderless = True
+        Window.fullscreen = True
+
         return Main_Class()
 
 test = Test_App()
