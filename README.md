@@ -1,5 +1,4 @@
-# Veloce-Dashboard
-This Repository contains all the files required for data collection in an IC engine and hardcoded for a custom Dashboard systemm
+# VR-Dashboard
 Veloce Racing Dashboard Software Devlopement
 
 This repo is dedicated to devlopement of DASHBOARD software using Python & Kivy.
