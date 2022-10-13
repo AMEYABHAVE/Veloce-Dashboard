@@ -32,6 +32,9 @@ Window.show_cursor = False
 Window.borderless = True
 Window.fullscreen = True
 
+#!/usr/bin/env python3
+import serial
+
 #Window.clearcolor = (255, 255, 255, 1) #to make background white
 
 #////////////////////////////////////////////////////////////
@@ -919,6 +922,20 @@ class Main_Screen(Screen,FloatLayout):
 #IMU page
 
 class IMU_Screen(Screen,FloatLayout):
+    
+    def MPU_data(self,*a):
+        #if ser.in_waiting > 0:
+        if __name__ == '__main__':
+            ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+            ser.reset_input_buffer()
+            
+        if ser.in_waiting > 0:
+            a = ser.readline().decode('utf-8').rstrip()
+            
+        self.Left_Front.text=f"{str(a)}"
+
+        Clock.schedule_once(self.MPU_data, 0.01)
+    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -1012,6 +1029,7 @@ class IMU_Screen(Screen,FloatLayout):
         )
 
         self.add_widget(self.Title)
+        self.MPU_data()
 
         #Calibrate____________________________________
         # self.Calibrate_Button = Button(
@@ -3346,7 +3364,7 @@ class Welcome_Screen(Screen,FloatLayout):
 
         self.add_widget(self.welcome_gif)
 
-        Clock.schedule_once(self.switch_to_main, 12)
+        Clock.schedule_once(self.switch_to_main, 7)
         
     #Switch to main screen
     def switch_to_main(self, *args):

@@ -18,9 +18,6 @@ from kivy.clock import Clock
 #from kivy.uix.label import Label
 #from kivy.lang import Builder
 
-import  smbus
-bus= smbus.SMBus(1)
-
 #////////////////////////////////////////////////////////////
 #Setting Resolution and Background Colour
 from kivy.config import Config
@@ -29,6 +26,25 @@ from kivy.core.window import Window
 #Config.set("graphics", "show_cursor", '0')
 #Set it to a tuple with the (width, height) in Pixels
 Window.size = (800, 480)
+
+#MPU////////////////////////////////////////////////////////
+
+import  smbus
+
+PWR_MGMT_1 = 0x6B
+SMPLRT_DIV = 0x19
+CONFIG     = 0x1A
+GYRO_CONFIG= 0x1B
+INT_ENABLE = 0x38
+ACCEL_XOUT_H = 0x3B
+ACCEL_YOUT_H = 0x3D
+ACCEL_ZOUT_H = 0x3F
+GYRO_XOUT_H = 0x43
+GYRO_YOUT_H = 0x45
+GYRO_ZOUT_H = 0x47
+
+bus= smbus.SMBus(1)
+Device_Address = 0x68
 
 
 #Window.clearcolor = (255, 255, 255, 1)
@@ -46,8 +62,7 @@ last_update = 0 #ddmmyy
 #Main Page
 engine_rpm = 0
 battery_voltage = 0
-throttle_raw = 0
-throttle = 0 #in percentage
+throttle = 95 #in percentage
 wheel_speed = 0
 gear_position = 0
 engine_temp = 0
@@ -62,166 +77,6 @@ brake_pressure = 95 #in percentage
 ##GUI
 #Main Page
 class Main_Screen(Screen,FloatLayout):
-
-    def Pot_data(self,*a):
-        
-        bus.write_byte(0x48, 0x03)
-        throttle_raw = bus.read_byte(0x48)
-        throttle = throttle_raw * 0.5848
-        self.Throttle.text = str(int(throttle))
-
-        bus.write_byte(0x48, 0x01)
-        brake_pressure_raw = bus.read_byte(0x48)
-        brake_pressure = brake_pressure_raw * 0.5848
-        self.Brake_Pressure.text = str(int(brake_pressure))
-
-        #Throttle Percentage Bar Logic____________________
-        if throttle < 5:
-            self.Throttle1.background_color=(0,0,0,255)
-            self.Throttle2.background_color=(0,0,0,255)
-            self.Throttle3.background_color=(0,0,0,255)
-            self.Throttle4.background_color=(0,0,0,255)
-            self.Throttle5.background_color=(0,0,0,255)
-            self.Throttle6.background_color=(0,0,0,255)
-            self.Throttle7.background_color=(0,0,0,255)
-
-        elif throttle > 5 and throttle < 15:
-            self.Throttle1.background_color=(0,255,0,255)
-            self.Throttle2.background_color=(0,0,0,255)
-            self.Throttle3.background_color=(0,0,0,255)
-            self.Throttle4.background_color=(0,0,0,255)
-            self.Throttle5.background_color=(0,0,0,255)
-            self.Throttle6.background_color=(0,0,0,255)
-            self.Throttle7.background_color=(0,0,0,255)
-
-        elif throttle > 15 and throttle < 30:
-            self.Throttle1.background_color=(0,255,0,255)
-            self.Throttle2.background_color=(0,255,0,255)
-            self.Throttle3.background_color=(0,0,0,255)
-            self.Throttle4.background_color=(0,0,0,255)
-            self.Throttle5.background_color=(0,0,0,255)
-            self.Throttle6.background_color=(0,0,0,255)
-            self.Throttle7.background_color=(0,0,0,255)
-
-        elif throttle > 30 and throttle < 45:
-            self.Throttle1.background_color=(0,255,0,255)
-            self.Throttle2.background_color=(0,255,0,255)
-            self.Throttle3.background_color=(0,255,0,255)
-            self.Throttle4.background_color=(0,0,0,255)
-            self.Throttle5.background_color=(0,0,0,255)
-            self.Throttle6.background_color=(0,0,0,255)
-            self.Throttle7.background_color=(0,0,0,255)
-
-        elif throttle > 45 and throttle < 60:
-            self.Throttle1.background_color=(0,255,0,255)
-            self.Throttle2.background_color=(0,255,0,255)
-            self.Throttle3.background_color=(0,255,0,255)
-            self.Throttle4.background_color=(0,255,0,255)
-            self.Throttle5.background_color=(0,0,0,255)
-            self.Throttle6.background_color=(0,0,0,255)
-            self.Throttle7.background_color=(0,0,0,255)
-
-        elif throttle > 60 and throttle < 75:
-            self.Throttle1.background_color=(0,255,0,255)
-            self.Throttle2.background_color=(0,255,0,255)
-            self.Throttle3.background_color=(0,255,0,255)
-            self.Throttle4.background_color=(0,255,0,255)
-            self.Throttle5.background_color=(0,255,0,255)
-            self.Throttle6.background_color=(0,0,0,255)
-            self.Throttle7.background_color=(0,0,0,255)
-
-        elif throttle > 75 and throttle < 90:
-            self.Throttle1.background_color=(0,255,0,255)
-            self.Throttle2.background_color=(0,255,0,255)
-            self.Throttle3.background_color=(0,255,0,255)
-            self.Throttle4.background_color=(0,255,0,255)
-            self.Throttle5.background_color=(0,255,0,255)
-            self.Throttle6.background_color=(0,255,0,255)
-            self.Throttle7.background_color=(0,0,0,255)
-
-        elif throttle > 90:
-            self.Throttle1.background_color=(0,255,0,255)
-            self.Throttle2.background_color=(0,255,0,255)
-            self.Throttle3.background_color=(0,255,0,255)
-            self.Throttle4.background_color=(0,255,0,255)
-            self.Throttle5.background_color=(0,255,0,255)
-            self.Throttle6.background_color=(0,255,0,255)
-            self.Throttle7.background_color=(0,255,0,255)
-
-        #Brake Percentage Bar Logic____________________
-        if brake_pressure < 5:
-            self.Brake1.background_color=(0,0,0,255)
-            self.Brake2.background_color=(0,0,0,255)
-            self.Brake3.background_color=(0,0,0,255)
-            self.Brake4.background_color=(0,0,0,255)
-            self.Brake5.background_color=(0,0,0,255)
-            self.Brake6.background_color=(0,0,0,255)
-            self.Brake7.background_color=(0,0,0,255)
-
-        elif brake_pressure > 5 and brake_pressure < 15:
-            self.Brake1.background_color=(0,0,255,255)
-            self.Brake2.background_color=(0,0,0,255)
-            self.Brake3.background_color=(0,0,0,255)
-            self.Brake4.background_color=(0,0,0,255)
-            self.Brake5.background_color=(0,0,0,255)
-            self.Brake6.background_color=(0,0,0,255)
-            self.Brake7.background_color=(0,0,0,255)
-
-        elif brake_pressure > 15 and brake_pressure < 30:
-            self.Brake1.background_color=(0,0,255,255)
-            self.Brake2.background_color=(0,0,255,255)
-            self.Brake3.background_color=(0,0,0,255)
-            self.Brake4.background_color=(0,0,0,255)
-            self.Brake5.background_color=(0,0,0,255)
-            self.Brake6.background_color=(0,0,0,255)
-            self.Brake7.background_color=(0,0,0,255)
-
-        elif brake_pressure > 30 and brake_pressure < 45:
-            self.Brake1.background_color=(0,0,255,255)
-            self.Brake2.background_color=(0,0,255,255)
-            self.Brake3.background_color=(0,0,255,255)
-            self.Brake4.background_color=(0,0,0,255)
-            self.Brake5.background_color=(0,0,0,255)
-            self.Brake6.background_color=(0,0,0,255)
-            self.Brake7.background_color=(0,0,0,255)
-
-        elif brake_pressure > 45 and brake_pressure < 60:
-            self.Brake1.background_color=(0,0,255,255)
-            self.Brake2.background_color=(0,0,255,255)
-            self.Brake3.background_color=(0,0,255,255)
-            self.Brake4.background_color=(0,0,255,255)
-            self.Brake5.background_color=(0,0,0,255)
-            self.Brake6.background_color=(0,0,0,255)
-            self.Brake7.background_color=(0,0,0,255)
-
-        elif brake_pressure > 60 and brake_pressure < 75:
-            self.Brake1.background_color=(0,0,255,255)
-            self.Brake2.background_color=(0,0,255,255)
-            self.Brake3.background_color=(0,0,255,255)
-            self.Brake4.background_color=(0,0,255,255)
-            self.Brake5.background_color=(0,0,255,255)
-            self.Brake6.background_color=(0,0,0,255)
-            self.Brake7.background_color=(0,0,0,255)
-
-        elif brake_pressure > 75 and brake_pressure < 90:
-            self.Brake1.background_color=(0,0,255,255)
-            self.Brake2.background_color=(0,0,255,255)
-            self.Brake3.background_color=(0,0,255,255)
-            self.Brake4.background_color=(0,0,255,255)
-            self.Brake5.background_color=(0,0,255,255)
-            self.Brake6.background_color=(0,0,255,255)
-            self.Brake7.background_color=(0,0,0,255)
-
-        elif brake_pressure > 90:
-            self.Brake1.background_color=(0,0,255,255)
-            self.Brake2.background_color=(0,0,255,255)
-            self.Brake3.background_color=(0,0,255,255)
-            self.Brake4.background_color=(0,0,255,255)
-            self.Brake5.background_color=(0,0,255,255)
-            self.Brake6.background_color=(0,0,255,255)
-            self.Brake7.background_color=(0,0,255,255)
-
-        Clock.schedule_once(self.Pot_data, 0.1)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -516,7 +371,151 @@ class Main_Screen(Screen,FloatLayout):
         )
         self.add_widget(self.Brake7)
 
-        self.Pot_data()
+        #Throttle Percentage Bar Logic____________________
+        if throttle < 5:
+            self.Throttle1.background_color=(0,0,0,255)
+            self.Throttle2.background_color=(0,0,0,255)
+            self.Throttle3.background_color=(0,0,0,255)
+            self.Throttle4.background_color=(0,0,0,255)
+            self.Throttle5.background_color=(0,0,0,255)
+            self.Throttle6.background_color=(0,0,0,255)
+            self.Throttle7.background_color=(0,0,0,255)
+
+        elif throttle > 5 and throttle < 15:
+            self.Throttle1.background_color=(0,255,0,255)
+            self.Throttle2.background_color=(0,0,0,255)
+            self.Throttle3.background_color=(0,0,0,255)
+            self.Throttle4.background_color=(0,0,0,255)
+            self.Throttle5.background_color=(0,0,0,255)
+            self.Throttle6.background_color=(0,0,0,255)
+            self.Throttle7.background_color=(0,0,0,255)
+
+        elif throttle > 15 and throttle < 30:
+            self.Throttle1.background_color=(0,255,0,255)
+            self.Throttle2.background_color=(0,255,0,255)
+            self.Throttle3.background_color=(0,0,0,255)
+            self.Throttle4.background_color=(0,0,0,255)
+            self.Throttle5.background_color=(0,0,0,255)
+            self.Throttle6.background_color=(0,0,0,255)
+            self.Throttle7.background_color=(0,0,0,255)
+
+        elif throttle > 30 and throttle < 45:
+            self.Throttle1.background_color=(0,255,0,255)
+            self.Throttle2.background_color=(0,255,0,255)
+            self.Throttle3.background_color=(0,255,0,255)
+            self.Throttle4.background_color=(0,0,0,255)
+            self.Throttle5.background_color=(0,0,0,255)
+            self.Throttle6.background_color=(0,0,0,255)
+            self.Throttle7.background_color=(0,0,0,255)
+
+        elif throttle > 45 and throttle < 60:
+            self.Throttle1.background_color=(0,255,0,255)
+            self.Throttle2.background_color=(0,255,0,255)
+            self.Throttle3.background_color=(0,255,0,255)
+            self.Throttle4.background_color=(0,255,0,255)
+            self.Throttle5.background_color=(0,0,0,255)
+            self.Throttle6.background_color=(0,0,0,255)
+            self.Throttle7.background_color=(0,0,0,255)
+
+        elif throttle > 60 and throttle < 75:
+            self.Throttle1.background_color=(0,255,0,255)
+            self.Throttle2.background_color=(0,255,0,255)
+            self.Throttle3.background_color=(0,255,0,255)
+            self.Throttle4.background_color=(0,255,0,255)
+            self.Throttle5.background_color=(0,255,0,255)
+            self.Throttle6.background_color=(0,0,0,255)
+            self.Throttle7.background_color=(0,0,0,255)
+
+        elif throttle > 75 and throttle < 90:
+            self.Throttle1.background_color=(0,255,0,255)
+            self.Throttle2.background_color=(0,255,0,255)
+            self.Throttle3.background_color=(0,255,0,255)
+            self.Throttle4.background_color=(0,255,0,255)
+            self.Throttle5.background_color=(0,255,0,255)
+            self.Throttle6.background_color=(0,255,0,255)
+            self.Throttle7.background_color=(0,0,0,255)
+
+        elif throttle > 90:
+            self.Throttle1.background_color=(0,255,0,255)
+            self.Throttle2.background_color=(0,255,0,255)
+            self.Throttle3.background_color=(0,255,0,255)
+            self.Throttle4.background_color=(0,255,0,255)
+            self.Throttle5.background_color=(0,255,0,255)
+            self.Throttle6.background_color=(0,255,0,255)
+            self.Throttle7.background_color=(0,255,0,255)
+
+        #Brake Percentage Bar Logic____________________
+        if brake_pressure < 5:
+            self.Brake1.background_color=(0,0,0,255)
+            self.Brake2.background_color=(0,0,0,255)
+            self.Brake3.background_color=(0,0,0,255)
+            self.Brake4.background_color=(0,0,0,255)
+            self.Brake5.background_color=(0,0,0,255)
+            self.Brake6.background_color=(0,0,0,255)
+            self.Brake7.background_color=(0,0,0,255)
+
+        elif brake_pressure > 5 and brake_pressure < 15:
+            self.Brake1.background_color=(0,0,255,255)
+            self.Brake2.background_color=(0,0,0,255)
+            self.Brake3.background_color=(0,0,0,255)
+            self.Brake4.background_color=(0,0,0,255)
+            self.Brake5.background_color=(0,0,0,255)
+            self.Brake6.background_color=(0,0,0,255)
+            self.Brake7.background_color=(0,0,0,255)
+
+        elif brake_pressure > 15 and brake_pressure < 30:
+            self.Brake1.background_color=(0,0,255,255)
+            self.Brake2.background_color=(0,0,255,255)
+            self.Brake3.background_color=(0,0,0,255)
+            self.Brake4.background_color=(0,0,0,255)
+            self.Brake5.background_color=(0,0,0,255)
+            self.Brake6.background_color=(0,0,0,255)
+            self.Brake7.background_color=(0,0,0,255)
+
+        elif brake_pressure > 30 and brake_pressure < 45:
+            self.Brake1.background_color=(0,0,255,255)
+            self.Brake2.background_color=(0,0,255,255)
+            self.Brake3.background_color=(0,0,255,255)
+            self.Brake4.background_color=(0,0,0,255)
+            self.Brake5.background_color=(0,0,0,255)
+            self.Brake6.background_color=(0,0,0,255)
+            self.Brake7.background_color=(0,0,0,255)
+
+        elif brake_pressure > 45 and brake_pressure < 60:
+            self.Brake1.background_color=(0,0,255,255)
+            self.Brake2.background_color=(0,0,255,255)
+            self.Brake3.background_color=(0,0,255,255)
+            self.Brake4.background_color=(0,0,255,255)
+            self.Brake5.background_color=(0,0,0,255)
+            self.Brake6.background_color=(0,0,0,255)
+            self.Brake7.background_color=(0,0,0,255)
+
+        elif brake_pressure > 60 and brake_pressure < 75:
+            self.Brake1.background_color=(0,0,255,255)
+            self.Brake2.background_color=(0,0,255,255)
+            self.Brake3.background_color=(0,0,255,255)
+            self.Brake4.background_color=(0,0,255,255)
+            self.Brake5.background_color=(0,0,255,255)
+            self.Brake6.background_color=(0,0,0,255)
+            self.Brake7.background_color=(0,0,0,255)
+
+        elif brake_pressure > 75 and brake_pressure < 90:
+            self.Brake1.background_color=(0,0,255,255)
+            self.Brake2.background_color=(0,0,255,255)
+            self.Brake3.background_color=(0,0,255,255)
+            self.Brake4.background_color=(0,0,255,255)
+            self.Brake5.background_color=(0,0,255,255)
+            self.Brake6.background_color=(0,0,255,255)
+            self.Brake7.background_color=(0,0,0,255)
+
+        elif brake_pressure > 90:
+            self.Brake1.background_color=(0,0,255,255)
+            self.Brake2.background_color=(0,0,255,255)
+            self.Brake3.background_color=(0,0,255,255)
+            self.Brake4.background_color=(0,0,255,255)
+            self.Brake5.background_color=(0,0,255,255)
+            self.Brake6.background_color=(0,0,255,255)
+            self.Brake7.background_color=(0,0,255,255)
 
     #Swipe gesture
     def on_touch_move(self, touch):
@@ -528,12 +527,53 @@ class Main_Screen(Screen,FloatLayout):
 #IMU page
 
 class IMU_Screen(Screen,FloatLayout):
+
+    def MPU_Init(self, *a):
+        bus.write_byte_data(Device_Address, SMPLRT_DIV, 7)
+
+        bus.write_byte_data(Device_Address, PWR_MGMT_1, 1)
+
+        bus.write_byte_data(Device_Address, CONFIG , 0)
+
+        bus.write_byte_data(Device_Address, GYRO_CONFIG, 24)
+
+        bus.write_byte_data(Device_Address, INT_ENABLE, 1)
+
+    def read_raw_data(self, addr):
+        high = bus.read_byte_data(Device_Address, addr)
+        low = bus.read_byte_data(Device_Address, addr+1)
+
+        value = ((high << 8) | low)
+
+        if(value>32768):
+            value = value - 65536
+        return value
+
+    def MPU_data(self,*a):
+        acc_x = self.read_raw_data(ACCEL_XOUT_H)
+        acc_y= self.read_raw_data(ACCEL_YOUT_H)
+        acc_z = self.read_raw_data(ACCEL_ZOUT_H)
+        gyro_x = self.read_raw_data(GYRO_XOUT_H)
+        gyro_y = self.read_raw_data(GYRO_YOUT_H)
+        gyro_z = self.read_raw_data(GYRO_ZOUT_H)
+        Ax = acc_x/16384.0
+        Ay = acc_y/16384.0
+        Az = acc_z/16384.0
+        Gx = gyro_x/131.0
+        Gy = gyro_y/131.0
+        Gz = gyro_z/131.0
+
+        self.Left_Front.text=f"Gx:{int(Gx)}  Ax:{int(Ax)}\nGy:{int(Gy)}  Ay:{int(Ay)}\nGz:{int(Gz)}  Az:{int(Az)}"
+
+
+        Clock.schedule_once(self.MPU_data, 0.01)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         #Background Image__________________________________
         self.background_img = Image(
-            source = "Chasis.png"    #PNG Only
+            source = "IMU.png"    #PNG Only
         )
         self.add_widget(self.background_img)
 
@@ -541,15 +581,15 @@ class IMU_Screen(Screen,FloatLayout):
         self.Left_Front = Button(
             disabled = True,
             #text settings
-            text = "20*",
-            font_size = "84sp",
+            text = "48  58\n58  55\n22  32",
+            font_size = "24sp",
             bold = True,
             #size and position
-            size_hint = (.30,.30),
-            pos_hint = {"x":.05, "y":.6},
+            size_hint = (.20,.20),
+            pos_hint = {"x":.10, "y":.55},
             #color settings
-            color = (0,0,0,1),
-            background_color = (255,255,255,1)
+            color = (1,1,1,1),
+            background_color = (255,255,255,0)
         )
 
         self.add_widget(self.Left_Front)
@@ -558,15 +598,15 @@ class IMU_Screen(Screen,FloatLayout):
         self.Right_Front = Button(
             disabled = True,
             #text settings
-            text = "20*",
-            font_size = "84sp",
+            text = "48  58\n58  55\n22  32",
+            font_size = "24sp",
             bold = True,
             #size and position
-            size_hint = (.30,.30),
-            pos_hint = {"x":.65, "y":.6},
+            size_hint = (.20,.20),
+            pos_hint = {"x":.68, "y":.55},
             #color settings
-            color = (0,0,0,1),
-            background_color = (255,255,255,1)
+            color = (1,1,1,1),
+            background_color = (255,255,255,0)
         )
 
         self.add_widget(self.Right_Front)
@@ -575,15 +615,15 @@ class IMU_Screen(Screen,FloatLayout):
         self.Left_Rear = Button(
             disabled = True,
             #text settings
-            text = "20*",
-            font_size = "84sp",
+            text = "48  58\n58  55\n22  32",
+            font_size = "24sp",
             bold = True,
             #size and position
-            size_hint = (.30,.30),
-            pos_hint = {"x":.05, "y":.1},
+            size_hint = (.20,.20),
+            pos_hint = {"x":.03, "y":.2},
             #color settings
-            color = (0,0,0,1),
-            background_color = (255,255,255,1)
+            color = (1,1,1,1),
+            background_color = (255,255,255,0)
         )
 
         self.add_widget(self.Left_Rear)
@@ -592,15 +632,15 @@ class IMU_Screen(Screen,FloatLayout):
         self.Rear_Right = Button(
             disabled = True,
             #text settings
-            text = "20*",
-            font_size = "84sp",
+            text = "48  58\n58  55\n22  32",
+            font_size = "24sp",
             bold = True,
             #size and position
-            size_hint = (.30,.30),
-            pos_hint = {"x":.65, "y":.1},
+            size_hint = (.20,.20),
+            pos_hint = {"x":.76, "y":.2},
             #color settings
-            color = (0,0,0,1),
-            background_color = (255,255,255,1)
+            color = (1,1,1,1),
+            background_color = (255,255,255,0)
         )
 
         self.add_widget(self.Rear_Right)
@@ -609,36 +649,39 @@ class IMU_Screen(Screen,FloatLayout):
         self.Title = Button(
             disabled = True,
             #text settings
-            text = "Slip Angle",
-            font_size = "48sp",
+            text = "IMU",
+            font_size = "36sp",
             bold = True,
             #size and position
             size_hint = (.30,.30),
-            pos_hint = {"x":.35, "y":.75},
+            pos_hint = {"x":.35, "y":.78 },
             #color settings
-            color = (0,0,0,1),
-            background_color = (255,255,255,1)
+            color = (1,1,1,1),
+            background_color = (255,255,255,0)
         )
 
         self.add_widget(self.Title)
+        
+        self.MPU_Init()
+        self.MPU_data()
 
         #Calibrate____________________________________
-        self.Calibrate_Button = Button(
-            #text settings
-            text = "Calibrate",
-            font_size = "24sp",
-            bold = True,
-            #size and position
-            size_hint = (.20,.10),
-            pos_hint = {"x":.40, "y":.05},
-            #color settings
-            color = (0,0,0,1),
-            background_color = (255,255,255,1)
+        # self.Calibrate_Button = Button(
+        #     #text settings
+        #     text = "Calibrate",
+        #     font_size = "24sp",
+        #     bold = True,
+        #     #size and position
+        #     size_hint = (.20,.10),
+        #     pos_hint = {"x":.40, "y":.05},
+        #     #color settings
+        #     color = (0,0,0,1),
+        #     background_color = (255,255,255,1)
 
-            #########LOGIC!!!!!!##########
-        )
+        #     #########LOGIC!!!!!!##########
+        # )
 
-        self.add_widget(self.Calibrate_Button)
+        # self.add_widget(self.Calibrate_Button)
 
     def on_touch_move(self, touch):
         if touch.x > touch.ox:
@@ -670,7 +713,7 @@ class Welcome_Screen(Screen,FloatLayout):
 
         self.add_widget(self.welcome_gif)
 
-        Clock.schedule_once(self.switch_to_main, 5)
+        Clock.schedule_once(self.switch_to_main, 2)
         
     def switch_to_main(self, *args):
         Main_App.get_running_app().change_screen(screen_name = "Main", screen_direction = "up")
